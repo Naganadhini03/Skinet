@@ -1,3 +1,4 @@
+using API.MiddleWare;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 
 builder.Services.AddScoped<IProductRepository,ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddCors();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -41,6 +43,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection(); // Ensure HTTPS redirection
 app.UseAuthorization(); // Authorization middleware (if needed)
+
+app.UseMiddleware<ExceptionMiddleWare>();
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+    .WithOrigins("http://localhost:4200","https://localhost:4200"));
 
 app.MapControllers(); 
 
